@@ -1,40 +1,21 @@
 <div style="text-align: center;">
 
-### papers_template_repo
+### SFNI_Spanish_Forest_National_Inventory-ready_to_use
 
 ---
 
-*Original data, code and results related to the scientific article titled*
+Tree and plot data from the SFNI ready to use on R
 
-# ***__title__***
+# ***Spanish Forest National Inventory {R}eady to use***
 
 </div>
 
 ## :file_folder: Folder Content
 
-- :open_file_folder: ***1_raw***: initial datasets
+:warning: Due to file size restrictions, the data was not uploaded to GitHub. However, you can access it through this  [OneDrive link](https://uvaes-my.sharepoint.com/:f:/g/personal/aitor_vazquez_veloso_uva_es/Ei3JqKe7Tq9HpVbsKZphyr4BxupYpg77xKpL-LPFijjYcQ?e=f4qWdD). If the link is not working, please let us know.
 
-  - :sunny: WorldClim data required for the simulations must be downloaded from its [official website](https://www.worldclim.org/data/index.html)
-  - :deciduous_tree::evergreen_tree: SFNI data required for the simulations must be downloaded from its [official website](https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional.html) or accessed via **link to my repo**:
-     - :deciduous_tree: Acess to the [SFNI2](https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2.html)
-     - :deciduous_tree: Acess to the [SFNI3](https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3.html)
-     - :deciduous_tree: Acess to the [SFNI4](https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html)
-  - :file_folder: information about x
+:computer: :brain: :floppy_disk: Check [here](../scripts/README.md) to see how the data was processed.
 
+:books: :floppy_disk: Data documentation is available [here](../output/metadata/SFNI_metadata_avv.md)
 
-
-- :open_file_folder: ***2_processed***: curated datasets
-
-  - :deciduous_tree::evergreen_tree: tree and plot data obtained from [iuFOR](https://iufor.uva.es) ([Quantitative silviculture group](https://github.com/iuFOR-QuantitativeForestry)) experimental plots
-    - :warning: According to the original paper (*Due to the sensitive nature of the data, raw data would remain available only under serious requests.*), data must be requested from the authors
-
-
-  - :file_folder: ***simanfor*** contains inputs and outputs for all the simulations developed with [SIMANFOR](www.simanfor.es). *Check out them! There are a lot of metrics unexplored in this paper* :wood: :maple_leaf:
-
-    - :seedling: **1_raw** contains the tree and plot original datasets used to perform simulations
-
-    - :seedling: :arrow_right: :deciduous_tree: **2_results** contains the simulation results grouped by the silvicultural scenario
-    
-  - :open_file_folder: :sunny: **climate**: climate data obtained from [WorldClim data](https://www.worldclim.org/data/index.html); data from the study area in available on this folder
-
-  - :open_file_folder: :sunny: **climate**: data extracted from [AEMET](https://www.aemet.es/es/portada) for different meteorological stations
+:new: :floppy_disk: New data can be uploaded soon. Stay tuned!

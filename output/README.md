@@ -1,21 +1,16 @@
 <div style="text-align: center;">
 
-### papers_template_repo
+### SFNI_Spanish_Forest_National_Inventory-ready_to_use
 
 ---
 
-*Original data, code and results related to the scientific article titled*
+Tree and plot data from the SFNI ready to use on R
 
-# ***__title__***
+# ***Spanish Forest National Inventory {R}eady to use***
 
 </div>
 
 ## :file_folder: Folder Content
 
-- :1234: ***tables***: summary of results
-- 📊 ***figures***: graphs and figures used in the article and additional information:
-  
-  -  📊 ***final_figures*** contains the figures used in the original paper
-  -  📊 ***tmp_figures*** contains different graphs used to understand the results of each analysis and metric
--  :sunrise_over_mountains: ***photos***:
--  :earth_africa: ***maps***:
+- :books: :floppy_disk: ***metadata*** contains the data documentation, available [here](./metadata/SFNI_metadata_avv.md)
+- 📊 ***data_reports***: contains *.html* files with basic variable descriptions at the plot and tree levels for an overview
