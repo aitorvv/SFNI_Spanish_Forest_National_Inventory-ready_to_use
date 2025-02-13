@@ -49,7 +49,7 @@ The content of this repository is under the [MIT license](./LICENSE).
 [ORCID](https://orcid.org/0000-0003-0227-506X) \\
 [Researchgate](https://www.researchgate.net/profile/Aitor_Vazquez_Veloso) \\
 [LinkedIn](https://www.linkedin.com/in/aitorvazquezveloso/) \\
-[Twitter](https://twitter.com/aitorvv) \\
+[X - Twitter](https://twitter.com/aitorvv) \\
 [UVa](https://portaldelaciencia.uva.es/investigadores/178830/detalle)
 
 ---
