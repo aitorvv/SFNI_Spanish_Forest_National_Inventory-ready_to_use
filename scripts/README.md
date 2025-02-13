@@ -55,3 +55,4 @@ Tree and plot data from the SFNI ready to use on R
 	- :floppy_disk: :arrow_right: :computer: *input*: already processed and harmonised data (`1_data/2_processed/9.0.2_sfni_forest_data.rdata`, `1_data/2_processed/0.4.0_climatic_classification.rdata`, `1_data/2_processed/0.3.2_sfni_corrected_position_data.rdata`)
 	- :computer: :arrow_right: :floppy_disk: *output*: merged data with some of the most useful columns (`1_data/2_processed/1.1_sfni_clean_data.rdata`) and with all the columns except climate from WorldClim (`1_data/2_processed/1.1_sfni_all_data.rdata`)
   
+  :warning: :scroll: Remember to update the script paths in your working directory if you plan to use that code
