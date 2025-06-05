@@ -7,23 +7,24 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 
-# calculate the basic plot data (N, G, DBH, H) from the trees data
-# written by: Aitor Vázquez Veloso
-# date: 2024-01-25
-# parameters:
-# - df_trees: data frame with the trees data
-# - plot_id_column_1: name of the column with the first plot ID
-# - plot_id_column_2: name of the column with the second plot ID; default is NA
-# - dbh_column: name of the column with the dbh data in the df_trees data frame; default is 'dbh'; units must be cm
-# - h_column: name of the column with the h data in the df_trees data frame; default is 'h'; units must be m
-# - expan_column: name of the column with the expan data in the df_trees data frame; default is 'expan'
-# - g_column: name of the column with the g data in the df_trees data frame; default is 'g'; units must be cm²
-# return:
-# df_plots: data frame with the plot data calculated from trees in the plot
 
 get_plot_data <- function(df_trees, plot_id_column_1, plot_id_column_2 = NA, 
                           dbh_column = 'dbh', h_column = 'h', expan_column = 'expan', g_column = 'g'){ 
   # , dead_column = NA){
+  
+  # calculate the basic plot data (N, G, DBH, H) from the trees data
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-01-25
+  # parameters:
+  # - df_trees: data frame with the trees data
+  # - plot_id_column_1: name of the column with the first plot ID
+  # - plot_id_column_2: name of the column with the second plot ID; default is NA
+  # - dbh_column: name of the column with the dbh data in the df_trees data frame; default is 'dbh'; units must be cm
+  # - h_column: name of the column with the h data in the df_trees data frame; default is 'h'; units must be m
+  # - expan_column: name of the column with the expan data in the df_trees data frame; default is 'expan'
+  # - g_column: name of the column with the g data in the df_trees data frame; default is 'g'; units must be cm²
+  # return:
+  # df_plots: data frame with the plot data calculated from trees in the plot
   
   # check variable names in df_trees
   if(dbh_column != 'dbh'){df_trees$dbh <- df_trees[[dbh_column]]}
@@ -69,7 +70,8 @@ get_plot_data <- function(df_trees, plot_id_column_1, plot_id_column_2 = NA,
       # helpful variables to use in the next step
       SUM_DBH = sum(dbh * expan, na.rm = TRUE),
       SUM_G = sum(g * expan, na.rm = TRUE),
-      SUM_H = sum(h * expan, na.rm = TRUE)
+      SUM_H = sum(h * expan, na.rm = TRUE),
+      SUM_H2 = sum((h^2 * expan), na.rm = TRUE)
     )
   
   # rename columns
@@ -97,6 +99,9 @@ get_plot_data <- function(df_trees, plot_id_column_1, plot_id_column_2 = NA,
   # mean height (m)
   df_plots$h_mean <- ifelse(df_plots$N > 0 & !is.na(df_plots$N), df_plots$SUM_H / df_plots$N, NA)
   
+  # quadratic mean height (m)
+  df_plots$hg <- ifelse(df_plots$N > 0 & !is.na(df_plots$N), (df_plots$SUM_H2 / df_plots$N)^0.5, NA)
+  
   # clean temporal variables
   df_plots <- df_plots %>%
     dplyr::select(-c(SUM_DBH, SUM_G, SUM_H))
@@ -104,10 +109,10 @@ get_plot_data <- function(df_trees, plot_id_column_1, plot_id_column_2 = NA,
   # reorder variables
   if(is.na(plot_id_column_2)){
     df_plots <- df_plots %>%
-      dplyr::select(PLOT_ID, N, N_0_75, N_75_125, N_125_175, N_175_225, N_225_275, N_275_325, N_325_375, N_375_425, N_425_, dbh_min, dbh_max, dbh_mean, dg, G, g_min, g_max, g_mean, h_min, h_max, h_mean)
+      dplyr::select(PLOT_ID, N, N_0_75, N_75_125, N_125_175, N_175_225, N_225_275, N_275_325, N_325_375, N_375_425, N_425_, dbh_min, dbh_max, dbh_mean, dg, G, g_min, g_max, g_mean, h_min, h_max, h_mean, hg)
   } else {
     df_plots <- df_plots %>%
-      dplyr::select(PLOT_ID, PLOT_ID_2, N, N_0_75, N_75_125, N_125_175, N_175_225, N_225_275, N_275_325, N_325_375, N_375_425, N_425_, dbh_min, dbh_max, dbh_mean, dg, G, g_min, g_max, g_mean, h_min, h_max, h_mean)
+      dplyr::select(PLOT_ID, PLOT_ID_2, N, N_0_75, N_75_125, N_125_175, N_175_225, N_225_275, N_275_325, N_325_375, N_375_425, N_425_, dbh_min, dbh_max, dbh_mean, dg, G, g_min, g_max, g_mean, h_min, h_max, h_mean, hg)
   }
   
   # return
@@ -116,22 +121,22 @@ get_plot_data <- function(df_trees, plot_id_column_1, plot_id_column_2 = NA,
 
 
 
-# calculate plot N, G, mean dbh and dg from the trees data
-# written by: Aitor Vázquez Veloso
-# date: 2024-09-12
-# parameters:
-# - df_trees: data frame with the trees data
-# - plot_id_column_1: name of the column with the first plot ID
-# - plot_id_column_2: name of the column with the second plot ID; default is NA
-# - dbh_column: name of the column with the dbh data in the df_trees data frame; default is 'dbh'; units must be cm
-# - expan_column: name of the column with the expan data in the df_trees data frame; default is 'expan'
-# - g_column: name of the column with the g data in the df_trees data frame; default is 'g'; units must be cm²
-# return:
-# df_plots: data frame with the plot data calculated from trees in the plot
-
 get_plot_data_basic <- function(df_trees, plot_id_column_1, plot_id_column_2 = NA, 
                           dbh_column = 'dbh', expan_column = 'expan', g_column = 'g'){ 
   # , dead_column = NA){
+  
+  # calculate plot N, G, mean dbh and dg from the trees data
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-09-12
+  # parameters:
+  # - df_trees: data frame with the trees data
+  # - plot_id_column_1: name of the column with the first plot ID
+  # - plot_id_column_2: name of the column with the second plot ID; default is NA
+  # - dbh_column: name of the column with the dbh data in the df_trees data frame; default is 'dbh'; units must be cm
+  # - expan_column: name of the column with the expan data in the df_trees data frame; default is 'expan'
+  # - g_column: name of the column with the g data in the df_trees data frame; default is 'g'; units must be cm²
+  # return:
+  # df_plots: data frame with the plot data calculated from trees in the plot
   
   # check variable names in df_trees
   if(dbh_column != 'dbh'){df_trees$dbh <- df_trees[[dbh_column]]}
@@ -193,18 +198,176 @@ get_plot_data_basic <- function(df_trees, plot_id_column_1, plot_id_column_2 = N
 }
 
 
-
-# support function to select the 100 biggest trees based on the value of a column (e.g., dbh or height)
-# written by: Aitor Vázquez Veloso
-# date: 2024-09-10
+# calculate the plot dominant height (m) from the height of the tallest trees in the plot
+# written by: Cristóbal Ordóñez Alonso
+# modified by Aitor Vázquez Veloso
+# date: 2024-02-09
 # parameters:
-# - list_of_trees: a data frame containing the tree records
-# - bigger_value_col: the name of the column to be used for selecting the biggest trees; default is "dbh"
-# - expan_col: the name of the column with the expansion factor data; default is "expan"
+# - df_trees: data frame with the tree records
+# - dbh_column: name of the column with the dbh data; if NA, the function will look for a column named 'dbh'; units must be cm
+# - h_column: name of the column with the height data; if NA, the function will look for a column named 'h'; units must be m
+# - expan_column: name of the column with the expansion factor data; if NA, the function will look for a column named 'expan'
+# - plot_id_column: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
 # return:
-# a data frame with the 100 biggest trees based on the value of the selected column
+# Ho: data frame with the plot id and the plot dominant height (m)
+
+# get_Ho <- function(df_trees, dbh_column = 'dbh', h_column = 'h', expan_column = 'expan', plot_id_column = "PLOT_ID"){
+#   
+#   # if plot_id_column is in the data frame, calculate the dominant height for each plot
+#   if(plot_id_column %in% names(df_trees)) {
+#     
+#     # unique plot IDs for Ho calculation
+#     PLOT_ID = unique(df_trees[[plot_id_column]])
+#     Ho = rep(NA, length(PLOT_ID))
+#     names(Ho) = PLOT_ID
+#     
+#     # for each plot
+#     for(i in 1:length(PLOT_ID)) {
+#       
+#       # get dominant height (m)
+#       Ho[i] = Ho_support(h = df_trees[[h_column]][df_trees[[plot_id_column]] == PLOT_ID[i]],
+#                          dbh = df_trees[[dbh_column]][df_trees[[plot_id_column]]  == PLOT_ID[i]],
+#                          expan = df_trees[[expan_column]][df_trees[[plot_id_column]]  == PLOT_ID[i]])
+#     }
+#     
+#     # merge PLot_ID and Ho
+#     Ho_final <- data.frame(PLOT_ID, Ho)
+#     
+#     # return
+#     return(Ho_final)
+#     
+#   } else {
+#     print('No plot ID column available on df_trees data frame provided.')
+#   }
+#   
+#   # return is plot_id_column is not in the data frame
+#   return(Ho_support(df_trees[[h_column]], df_trees[[dbh_column]], df_trees[[expan_column]]))
+# }
+
+
+
+# support function to calculate the plot dominant height (m) 
+# written by: Cristóbal Ordóñez Alonso
+# modified by Aitor Vázquez Veloso
+# date: 2024-02-09
+# parameters:
+# - h: height of the trees in the plot
+# - dbh: dbh of the trees in the plot
+# - expan: expansion factor of the trees in the plot
+# return:
+# dominant height (m) of the plot
+# Ho_support <- function(h, dbh, expan) {
+#   
+#   # order trees by dbh
+#   o <- order(dbh, decreasing = TRUE)
+#   h = h[o]
+#   expan = expan[o]
+#   
+#   # sum of the expan in the plot
+#   expan_sum = 0 
+#   for(i in 1:length(h)) {
+#     
+#     # accumulate expan
+#     expan_sum = expan_sum + expan[i]
+#     
+#     # if expan_sum > 100, return dominant height
+#     if(expan_sum > 100) return(sum(h[1:i] * expan[1:i], na.rm = TRUE) / sum(h[1:i] * expan[1:i] / h[1:i], na.rm = TRUE))
+#   }
+#   
+#   # return dominant height
+#   return(sum(h * expan) / sum(expan))
+# }
+
+
+
+# calculate the plot dominant diameter (cm) from the diameter of the bigger trees in the plot
+# written by: Cristóbal Ordóñez Alonso
+# modified by Aitor Vázquez Veloso
+# date: 2024-02-09
+# parameters:
+# - df_trees: data frame with the tree records
+# - dbh_column: name of the column with the dbh data; if NA, the function will look for a column named 'dbh'; units must be cm
+# - expan_column: name of the column with the expansion factor data; if NA, the function will look for a column named 'expan'
+# - plot_id_column: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
+# return:
+# Do: data frame with the plot id and the plot dominant diameter (cm)
+# get_Do <- function(df_trees, dbh_column = 'dbh', expan_column = 'expan', plot_id_column = "PLOT_ID"){
+#   
+#   # if plot_id_column is in the data frame, calculate the dominant height for each plot
+#   if(plot_id_column %in% names(df_trees)) {
+#     
+#     # unique plot IDs for Ho calculation
+#     PLOT_ID = unique(df_trees[[plot_id_column]])
+#     Do = rep(NA, length(PLOT_ID))
+#     names(Do) = PLOT_ID
+#     
+#     # for each plot
+#     for(i in 1:length(PLOT_ID)) {
+#       
+#       # get dominant dbh (cm)
+#       Do[i] = Do_support(dbh = df_trees[[dbh_column]][df_trees[[plot_id_column]]  == PLOT_ID[i]],
+#                          expan = df_trees[[expan_column]][df_trees[[plot_id_column]]  == PLOT_ID[i]])
+#     }
+#     
+#     # merge PLot_ID and Do
+#     Do_final <- data.frame(PLOT_ID, Do)
+#     
+#     # return
+#     return(Do_final)
+#     
+#   } else {
+#     print('No plot ID column available on df_trees data frame provided.')
+#   }
+#   
+#   # return is plot_id_column is not in the data frame
+#   return(Do_support(df_trees[[dbh_column]], df_trees[[expan_column]]))
+# }
+
+
+
+# support function to calculate the plot dominant diameter (cm) 
+# written by: Cristóbal Ordóñez Alonso
+# modified by Aitor Vázquez Veloso
+# date: 2024-02-09
+# parameters:
+# - dbh: dbh of the trees in the plot
+# - expan: expansion factor of the trees in the plot
+# return:
+# dominant diameter (cm) of the plot
+# Do_support <- function(dbh, expan) {
+#   
+#   # order trees by dbh
+#   o <- order(dbh, decreasing = TRUE)
+#   expan = expan[o]
+#   
+#   # sum of the expan in the plot
+#   expan_sum = 0 
+#   for(i in 1:length(dbh)) {
+#     
+#     # accumulate expan
+#     expan_sum = expan_sum + expan[i]
+#     
+#     # if expan_sum > 100, return dominant height
+#     if(expan_sum > 100) return(sum(dbh[1:i] * expan[1:i], na.rm = TRUE) / sum(dbh[1:i] * expan[1:i] / dbh[1:i], na.rm = TRUE))
+#   }
+#   
+#   # return dominant diameter
+#   return(sum(dbh * expan) / sum(expan))
+# }
+
+
 
 get_100_bigger_trees <- function(list_of_trees, bigger_value_col = "dbh", expan_col = "expan") {
+  
+  # support function to select the 100 biggest trees based on the value of a column (e.g., dbh or height)
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-09-10
+  # parameters:
+  # - list_of_trees: a data frame containing the tree records
+  # - bigger_value_col: the name of the column to be used for selecting the biggest trees; default is "dbh"
+  # - expan_col: the name of the column with the expansion factor data; default is "expan"
+  # return:
+  # a data frame with the 100 biggest trees based on the value of the selected column
   
   # sort the trees by the desired value in descending order
   sorted_trees <- list_of_trees %>%
@@ -247,21 +410,21 @@ get_100_bigger_trees <- function(list_of_trees, bigger_value_col = "dbh", expan_
 
 
 
-# Function to calculate dominant value (typically dominant height or dominant diameter) for each plot
-# written by: Aitor Vázquez Veloso
-# date: 2024-09-10
-# parameters:
-# - trees: a data frame containing the tree records
-# - dominant_value_col: the name of the column to be used for calculating the dominant value; 
-#                       default is "h" to calculate dominant height, change to "dbh" for dominant diameter
-# - plot_id_col: the name of the column with the plot ID data; default is "PLOT_ID"
-# - bigger_value_col: the name of the column to be used for selecting the biggest trees; default is "dbh"
-# - expan_col: the name of the column with the expansion factor data; default is "expan"
-# return:
-# a data frame with the plot ID and the dominant value for each plot
-
 get_dominant_value <- function(trees, dominant_value_col = "h", output_col_name = 'Ho',
                                plot_id_col = 'PLOT_ID', bigger_value_col = "dbh", expan_col = "expan") {
+  
+  # Function to calculate dominant value (typically dominant height or dominant diameter) for each plot
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-09-10
+  # parameters:
+  # - trees: a data frame containing the tree records
+  # - dominant_value_col: the name of the column to be used for calculating the dominant value; 
+  #                       default is "h" to calculate dominant height, change to "dbh" for dominant diameter
+  # - plot_id_col: the name of the column with the plot ID data; default is "PLOT_ID"
+  # - bigger_value_col: the name of the column to be used for selecting the biggest trees; default is "dbh"
+  # - expan_col: the name of the column with the expansion factor data; default is "expan"
+  # return:
+  # a data frame with the plot ID and the dominant value for each plot
   
   # list to return
   dominant_values <- tibble(PLOT_ID = character(), value = numeric())
@@ -325,20 +488,20 @@ get_dominant_value <- function(trees, dominant_value_col = "h", output_col_name 
 
 
 
-# calculate the quadratic mean dbh (cm) from plot basal area (m²/ha) and plot density (N trees/ha)
-# written by: Aitor Vázquez Veloso
-# date: 2024-01-25
-# parameters:
-# - df: data frame in which the relative coordinates will be added
-# - G_column: name of the column with the plot basal area (m²/ha); if NA, the function will look for a column named 'G'
-# - N_column: name of the column with the plot density (N trees/ha); if NA, the function will look for a column named 'N'
-# - G: plot basal area (m²/ha); if NA, the function will look for a column named 'G'
-# - N: plot density (N trees/ha); if NA, the function will look for a column named 'N'
-# return:
-# dg: quadratic mean dbh (cm)
-
 get_Dg <- function(df, G_column = NA, N_column = NA, G = NA, N = NA){
-  
+
+  # calculate the quadratic mean dbh (cm) from plot basal area (m²/ha) and plot density (N trees/ha)
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-01-25
+  # parameters:
+  # - df: data frame in which the relative coordinates will be added
+  # - G_column: name of the column with the plot basal area (m²/ha); if NA, the function will look for a column named 'G'
+  # - N_column: name of the column with the plot density (N trees/ha); if NA, the function will look for a column named 'N'
+  # - G: plot basal area (m²/ha); if NA, the function will look for a column named 'G'
+  # - N: plot density (N trees/ha); if NA, the function will look for a column named 'N'
+  # return:
+  # dg: quadratic mean dbh (cm)
+    
   # select variables according to the information provided
   if(!is.na(G_column)){G <- df[[G_column]]} else if(!is.na(G)){G <- G} else {G <- df$G}
   if(!is.na(N_column)){N <- df[[N_column]]} else if(!is.na(N)){N <- N} else {N <- df$N}
@@ -352,18 +515,18 @@ get_Dg <- function(df, G_column = NA, N_column = NA, G = NA, N = NA){
 
 
 
-# calculate the plot slenderness
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_plots: data frame with the plot records
-# - hm_column: name of the column with the mean height data; if NA, the function will look for a column named 'h_mean'; units must be m
-# - dbhm_column: name of the column with the mean dbh data; if NA, the function will look for a column named 'dbh_mean'; units must be cm
-# return:
-# slenderness: plot slenderness
-
 get_plot_slenderness <- function(df_plots, hm_column = 'h_mean', dbhm_column = 'dbh_mean'){
-  
+
+  # calculate the plot slenderness
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_plots: data frame with the plot records
+  # - hm_column: name of the column with the mean height data; if NA, the function will look for a column named 'h_mean'; units must be m
+  # - dbhm_column: name of the column with the mean dbh data; if NA, the function will look for a column named 'dbh_mean'; units must be cm
+  # return:
+  # slenderness: plot slenderness
+    
   # calculate the plot slenderness  
   slenderness <- df_plots[[hm_column]] * 100 / df_plots[[dbhm_column]]
   
@@ -373,18 +536,18 @@ get_plot_slenderness <- function(df_plots, hm_column = 'h_mean', dbhm_column = '
 
 
 
-# calculate the plot dominant slenderness
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_plots: data frame with the plot records
-# - Ho_column: name of the column with the mean height data; if NA, the function will look for a column named 'Ho'; units must be m
-# - Do_column: name of the column with the mean dbh data; if NA, the function will look for a column named 'Do'; units must be cm
-# return:
-# dominant_slenderness: plot dominant slenderness
-
 get_plot_dominant_slenderness <- function(df_plots, Ho_column = 'Ho', Do_column = 'Do'){
-  
+
+  # calculate the plot dominant slenderness
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_plots: data frame with the plot records
+  # - Ho_column: name of the column with the mean height data; if NA, the function will look for a column named 'Ho'; units must be m
+  # - Do_column: name of the column with the mean dbh data; if NA, the function will look for a column named 'Do'; units must be cm
+  # return:
+  # dominant_slenderness: plot dominant slenderness
+    
   # calculate the plot dominant slenderness
   dominant_slenderness <- df_plots[[Ho_column]] * 100 / df_plots[[Do_column]]
   
@@ -394,19 +557,19 @@ get_plot_dominant_slenderness <- function(df_plots, Ho_column = 'Ho', Do_column 
 
 
 
-# calculate the stand density index
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_plots: data frame with the plot records
-# - N_column: name of the column with the plot density data; if NA, the function will look for a column named 'N'
-# - Dg_column: name of the column with the quadratic mean dbh data; if NA, the function will look for a column named 'Dg'; units must be cm
-# - r_value: exponent value; if NA, the function will use the default value of 1.605
-# return:
-# SDI: stand density index
-
 get_SDI <- function(df_plots, N_column = 'N', Dg_column = 'dg', r_value = 1.605){
-  
+
+  # calculate the stand density index
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_plots: data frame with the plot records
+  # - N_column: name of the column with the plot density data; if NA, the function will look for a column named 'N'
+  # - Dg_column: name of the column with the quadratic mean dbh data; if NA, the function will look for a column named 'Dg'; units must be cm
+  # - r_value: exponent value; if NA, the function will use the default value of 1.605
+  # return:
+  # SDI: stand density index
+    
   # calculate the stand density index
   SDI <- df_plots[[N_column]] * ((25 / df_plots[[Dg_column]]) ** r_value)
   
@@ -416,18 +579,18 @@ get_SDI <- function(df_plots, N_column = 'N', Dg_column = 'dg', r_value = 1.605)
 
 
 
-# calculate the Hart index
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_plots: data frame with the plot records
-# - Ho_column: name of the column with the mean height data; if NA, the function will look for a column named 'Ho'; units must be m
-# - N_column: name of the column with the plot density data; if NA, the function will look for a column named 'N'
-# return:
-# S: Hart index
-
 get_hart_index <- function(df_plots, Ho_column = 'Ho', N_column = 'N'){
-  
+
+  # calculate the Hart index
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_plots: data frame with the plot records
+  # - Ho_column: name of the column with the mean height data; if NA, the function will look for a column named 'Ho'; units must be m
+  # - N_column: name of the column with the plot density data; if NA, the function will look for a column named 'N'
+  # return:
+  # S: Hart index
+    
   # calculate the Hart index
   S <- 10000 / (df_plots[[Ho_column]] * sqrt(df_plots[[N_column]]))
   
@@ -437,18 +600,18 @@ get_hart_index <- function(df_plots, Ho_column = 'Ho', N_column = 'N'){
 
 
 
-# calculate the Hart index for staggered plots
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_plots: data frame with the plot records
-# - Ho_column: name of the column with the mean height data; if NA, the function will look for a column named 'Ho'; units must be m
-# - N_column: name of the column with the plot density data; if NA, the function will look for a column named 'N'
-# return:
-# S_staggered: Hart index for staggered plots
-
 get_hart_index_staggered <- function(df_plots, Ho_column = 'Ho', N_column = 'N'){
-  
+
+  # calculate the Hart index for staggered plots
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_plots: data frame with the plot records
+  # - Ho_column: name of the column with the mean height data; if NA, the function will look for a column named 'Ho'; units must be m
+  # - N_column: name of the column with the plot density data; if NA, the function will look for a column named 'N'
+  # return:
+  # S_staggered: Hart index for staggered plots
+    
   # calculate the Hart index
   S_staggered <- (10000 / df_plots[[Ho_column]]) * sqrt(2 / df_plots[[N_column]] * sqrt(3))
   
@@ -458,21 +621,21 @@ get_hart_index_staggered <- function(df_plots, Ho_column = 'Ho', N_column = 'N')
 
 
 
-# Calculate plot basal area (G m2/ha) and plot density (N trees/ha) by species
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_trees: data frame with the tree records
-# - plot_id_column_1: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
-# - species_column: name of the column with the species ID data; if NA, the function will look for a column named 'species'
-# - expan_column: name of the column with the expansion factor data; if NA, the function will look for a column named 'expan'
-# - g_column: name of the column with the basal area data; if NA, the function will look for a column named 'g'
-# return:
-# plots_sp: data frame with the plot basal area (G m2/ha) and plot density (N trees/ha) by species
-
 get_plot_by_species <- function(df_trees, plot_id_column_1 = 'PLOT_ID', species_column = 'species', 
                                 expan_column = 'expan', g_column = 'g'){
-  
+
+  # Calculate plot basal area (G m2/ha) and plot density (N trees/ha) by species
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_trees: data frame with the tree records
+  # - plot_id_column_1: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
+  # - species_column: name of the column with the species ID data; if NA, the function will look for a column named 'species'
+  # - expan_column: name of the column with the expansion factor data; if NA, the function will look for a column named 'expan'
+  # - g_column: name of the column with the basal area data; if NA, the function will look for a column named 'g'
+  # return:
+  # plots_sp: data frame with the plot basal area (G m2/ha) and plot density (N trees/ha) by species
+    
   # check variable names in df_trees
   if(expan_column != 'expan'){df_trees$expan <- df_trees[[expan_column]]}
   if(g_column != 'g'){df_trees$g <- df_trees[[g_column]]}
@@ -525,7 +688,7 @@ get_plot_by_species <- function(df_trees, plot_id_column_1 = 'PLOT_ID', species_
   }
   
   # clean previous data
-  plots_sp_123 <- dplyr::select(plots_sp_123, -c(species_column, N_sp, G_sp))
+  plots_sp_123 <- dplyr::select(plots_sp_123, -c(N_sp, G_sp))
   
   # return
   return(plots_sp_123)
@@ -533,21 +696,21 @@ get_plot_by_species <- function(df_trees, plot_id_column_1 = 'PLOT_ID', species_
 
 
 
-# Calculate plot basal area (G m2/ha) and plot density (N trees/ha) by dead/alive
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-09
-# parameters:
-# - df_trees: data frame with the tree records
-# - plot_id_column_1: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
-# - dead_column: name of the column with the dead/alive data; if NA, the function will look for a column named 'dead'
-# - expan_column: name of the column with the expansion factor data; if NA, the function will look for a column named 'expan'
-# - g_column: name of the column with the basal area data; if NA, the function will look for a column named 'g'
-# return:
-# plots_status: data frame with the plot basal area (G m2/ha) and plot density (N trees/ha) by dead/alive
-
 get_plot_mortality <- function(df_trees, plot_id_column_1 = 'PLOT_ID', 
                                dead_column = 'dead', expan_column = 'expan', g_column = 'g'){
-  
+
+  # Calculate plot basal area (G m2/ha) and plot density (N trees/ha) by dead/alive
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-09
+  # parameters:
+  # - df_trees: data frame with the tree records
+  # - plot_id_column_1: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
+  # - dead_column: name of the column with the dead/alive data; if NA, the function will look for a column named 'dead'
+  # - expan_column: name of the column with the expansion factor data; if NA, the function will look for a column named 'expan'
+  # - g_column: name of the column with the basal area data; if NA, the function will look for a column named 'g'
+  # return:
+  # plots_status: data frame with the plot basal area (G m2/ha) and plot density (N trees/ha) by dead/alive
+    
   # check variable names in df_trees
   if(expan_column != 'expan'){df_trees$expan <- df_trees[[expan_column]]}
   if(g_column != 'g'){df_trees$g <- df_trees[[g_column]]}
@@ -607,20 +770,20 @@ get_plot_mortality <- function(df_trees, plot_id_column_1 = 'PLOT_ID',
 
 
 
-# calculate the WGS84 coordinates of the plots using the UTM coordinates
-# written by: Aitor Vázquez Veloso
-# date: 2024-02-12
-# parameters:
-# - df: data frame with the plot records
-# - plot_id_column: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
-# - province_column: name of the column with the province data; if NA, the function will look for a column named 'Province'
-# - x_column: name of the column with the UTM X coordinates; if NA, the function will look for a column named 'X_UTM'
-# - y_column: name of the column with the UTM Y coordinates; if NA, the function will look for a column named 'Y_UTM'
-# return:
-# df: data frame with the WGS84 coordinates of the plots, the zone code and the plot ID
-
 get_wgs84_coordinates <- function(df, plot_id_column = 'PLOT_ID', province_column = 'Province', x_column = 'X_UTM', y_column = 'Y_UTM'){
-  
+
+  # calculate the WGS84 coordinates of the plots using the UTM coordinates
+  # written by: Aitor Vázquez Veloso
+  # date: 2024-02-12
+  # parameters:
+  # - df: data frame with the plot records
+  # - plot_id_column: name of the column with the plot ID data; if NA, the function will look for a column named 'PLOT_ID'
+  # - province_column: name of the column with the province data; if NA, the function will look for a column named 'Province'
+  # - x_column: name of the column with the UTM X coordinates; if NA, the function will look for a column named 'X_UTM'
+  # - y_column: name of the column with the UTM Y coordinates; if NA, the function will look for a column named 'Y_UTM'
+  # return:
+  # df: data frame with the WGS84 coordinates of the plots, the zone code and the plot ID
+    
   # check variable names in the original df
   if(plot_id_column != 'PLOT_ID'){df$PLOT_ID <- df[[plot_id_column]]}
   if(province_column != 'Province'){df$Province <- df[[province_column]]}
