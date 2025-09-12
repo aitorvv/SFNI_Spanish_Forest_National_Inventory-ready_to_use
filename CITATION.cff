@@ -1,0 +1,11 @@
+cff-version: 1.0.0
+message: "If you use this resources, please cite it as below."
+authors:
+- family-names: "Vázquez-Veloso"
+  given-names: "Aitor"
+  orcid: "https://orcid.org/0000-0003-0227-506X"
+title: 'GitHub repository "Spanish Forest National Inventory {R}eady to use"'
+version: 1.0.0
+doi: 
+date-released: 2025-09-12
+url: "https://github.com/aitorvv/SFNI_Spanish_Forest_National_Inventory-ready_to_use"
